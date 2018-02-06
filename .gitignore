@@ -1,0 +1,4 @@
+expr/
+venv/
+
+*.sw[a-z]
