@@ -37,8 +37,8 @@ learning_rate = 1e-6
 clip_norm = 1.0
 
 model_name = 'IRNN'
-if not os.path.exists(model_name):
-    os.system('mkdir {}'.format(model_name))
+if not os.path.exists(os.path.join('expr', model_name)):
+    os.system('mkdir {}'.format(os.path.join('expr', model_name)))
 
 # the data, shuffled and split between train and test sets
 (x_train, y_train), (x_test, y_test) = mnist.load_data()
@@ -71,11 +71,11 @@ model.compile(loss='categorical_crossentropy',
               optimizer=rmsprop,
               metrics=['accuracy'])
 
-train_log = keras.callbacks.CSVLogger(os.path.join(model_name, 'training.log'))
+train_log = keras.callbacks.CSVLogger(os.path.join('expr', model_name, 'training.log'))
 
 class ParamLogger(keras.callbacks.Callback):
     def on_train_begin(self, logs={}):
-        logging.basicConfig(filename=os.path.join(model_name,  'params_recorder.log'), level=logging.INFO)
+        logging.basicConfig(filename=os.path.join('expr', model_name,  'params_recorder.log'), level=logging.INFO)
 
     def on_batch_end(self, batch, logs={}):
         return
@@ -83,7 +83,7 @@ class ParamLogger(keras.callbacks.Callback):
     def on_train_end(self, logs={}):
         recurrent_weights = model.layers[0].get_weights()[1]
         eigenvalue, _ = np.linalg.eig(recurrent_weights)
-        np.savez(os.path.join(model_name, "RecurrentKernel-final-epoch.npy"), kernel=recurrent_weights, eigenvalue=eigenvalue)
+        np.savez(os.path.join('expr', model_name, "RecurrentKernel-final-epoch.npy"), kernel=recurrent_weights, eigenvalue=eigenvalue)
         return
 
     def on_epoch_begin(self, epoch, logs={}):
@@ -98,7 +98,7 @@ class ParamLogger(keras.callbacks.Callback):
         logging.info('EigenValue | Max: {} | Min: {}'.format(np.max(eigenvalue), np.min(eigenvalue)))
         logging.info('{}\n\n'.format(eigenvalue))
         if epoch % 5 == 0:
-            np.savez(os.path.join(model_name, "RecurrentKernel-epoch-{}.npy".format(epoch)), kernel=recurrent_weights, eigenvalue=eigenvalue)
+            np.savez(os.path.join('expr', model_name, "RecurrentKernel-epoch-{}.npy".format(epoch)), kernel=recurrent_weights, eigenvalue=eigenvalue)
         return
 
     def on_batch_begin(self, batch, logs={}):
@@ -109,7 +109,7 @@ class ParamLogger(keras.callbacks.Callback):
 
 paramlogger = ParamLogger()
 
-ckpt_saver = keras.callbacks.ModelCheckpoint(os.path.join(model_name, 'weights.{epoch:02d}-{acc: .4f}.hdf5'), 
+ckpt_saver = keras.callbacks.ModelCheckpoint(os.path.join('expr', model_name, 'weights.{epoch:02d}-{acc: .4f}.hdf5'), 
         monitor='acc', 
         verbose=1, 
         period=10)

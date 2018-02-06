@@ -25,8 +25,8 @@ from keras.optimizers import RMSprop
 import os
 
 model_name = 'LSTM'
-if not os.path.exists(model_name):
-    os.system('mkdir {}'.format(model_name))
+if not os.path.exists(os.path.join('expr', model_name)):
+    os.system('mkdir {}'.format(os.path.join('expr', model_name)))
 batch_size = 32
 num_classes = 10
 epochs = 200
@@ -66,9 +66,9 @@ model.compile(loss='categorical_crossentropy',
               optimizer=rmsprop,
               metrics=['accuracy'])
 
-train_log = keras.callbacks.CSVLogger(os.path.join(model_name, 'training.log'))
+train_log = keras.callbacks.CSVLogger(os.path.join('expr', model_name, 'training.log'))
 
-ckpt_saver = keras.callbacks.ModelCheckpoint(os.path.join(model_name, 'weights.{epoch:02d}-{acc: .4f}.hdf5'), 
+ckpt_saver = keras.callbacks.ModelCheckpoint(os.path.join('expr', model_name, 'weights.{epoch:02d}-{acc: .4f}.hdf5'), 
         monitor='acc', 
         verbose=1, 
         period=10)
